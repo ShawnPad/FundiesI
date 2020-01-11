@@ -1,0 +1,26 @@
+;; The first three lines of this file were inserted by DrRacket. They record metadata
+;; about the language level of this file in a form that our tools can easily process.
+#reader(lib "htdp-intermediate-lambda-reader.ss" "lang")((modname test2) (read-case-sensitive #t) (teachpacks ()) (htdp-settings #(#t constructor repeating-decimal #f #t none #f () #f)))
+(require 2htdp/image)
+(require 2htdp/universe)
+(define BW 1000)
+(define BH 500)
+(define BG (empty-scene BW BH))
+(define START (make-posn (/ BW 2) (/ BH 2)))
+(define OBJ (circle 10 "solid" "blue"))
+(define-struct enemy (pos vel img))
+(define (E x) (make-enemy (make-posn (+ (/ BW 2) x) (/ BH 2)) (make-posn 1 -1) OBJ))
+(define EL (list (E 1) (E 10) (E 20) (E 30) (E 40)))   
+(define (draw e)
+  (place-image (enemy-img e) (posn-x (enemy-pos e)) (posn-y (enemy-pos e)) BG))
+(define (tick e)
+  (make-enemy (move (enemy-pos e) (enemy-vel e)) (enemy-vel e) OBJ))
+(define (move pos vel)
+  (make-posn (+ (posn-x pos) (posn-x vel)) (+ (posn-y pos) (posn-y vel))))
+(define (draws el)
+  (apply overlay (map draw el)))
+(define (ticks el)
+  (map tick el))
+(big-bang EL
+  [to-draw draws]
+  [on-tick ticks])
